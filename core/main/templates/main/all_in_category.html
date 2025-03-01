@@ -1,0 +1,64 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}Категория: {{category}}{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="page-content">
+
+          <!-- ***** Category Items Start ***** -->
+          <div class="live-stream" style="margin-top: 0;">
+            <div class="col-lg-12 ">
+              <div class="heading-section">
+                <h4><em>Все товары в категории: </em> {{category}}</h4>
+              </div>
+            </div>
+            <div class="row">
+              {% for product in products%}
+              <div class="col-lg-3 col-sm-6">
+                <a href="{% url 'product_details' product.id %}">
+                  <div class="item">
+                    <div class="thumb">
+                      <img src="{{ product.get_main_image }}" alt="">
+                      <div class="hover-effect">
+                        <div class="content">
+                          <div class="live">
+                            <a href="#">Live</a>
+                          </div>
+                          <ul>
+                            <li><a href="#"><i class="fa fa-eye"></i> 1.2K</a></li>
+                            <li><a href="#"><i class="fa fa-gamepad"></i> CS-GO</a></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="down-content">
+                      <div class="avatar">
+                        {% if product.seller.avatar %}
+                        <a href="{% url 'profile_page' product.seller.id %}"><img src="{{ product.seller.avatar.url}}" alt="" style="max-width: 46px; border-radius: 50%; float: left;"></a>
+                        {% else %}
+                          <a href="{% url 'profile_page' product.seller.id %}"><img src="{% static 'assets/images/default.jpg' %}" alt="" style="max-width: 46px; border-radius: 50%; float: left;"></a>
+                        {% endif %}
+                      </div>
+                      <a href="{% url 'profile_page' product.seller.id %}"><span><i class="fa fa-check"></i> {{ product.seller }}</span></a>
+                      <h4>{{ product.name }}</h4>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              {% empty %}
+                <h5>Товары в категории отсувствуют в наличии</h5>
+              {% endfor %}
+              <div class="col-lg-12">
+              </div>
+            </div>
+          </div>
+          <!-- ***** Category Items End ***** -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
