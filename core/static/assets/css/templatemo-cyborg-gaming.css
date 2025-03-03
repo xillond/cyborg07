@@ -1597,6 +1597,53 @@ Top Streamers Style
   padding: 8px 20px;
 }
 
+/*
+---------------------------------------------
+Login And Register Page Style
+---------------------------------------------
+*/
+
+.login-form {
+  background-color: rgba(0, 0, 0, 0.5); /* Прозрачный фон */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Тень */
+}
+
+.login-form label {
+  color: white; /* Цвет текста меток */
+}
+
+.login-form input {
+  background-color: transparent; /* Прозрачный фон полей */
+  border: 1px solid white; /* Цвет границы полей */
+  color: white; /* Цвет текста в полях */
+  padding: 7px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+
+.login-form input:focus {
+  outline: none; /* Удаление обводки при фокусе */
+  border-color: #007bff; /* Цвет границы при фокусе */
+}
+
+.main-border-button-aa {
+  background-color: #007bff; /* Фон кнопки */
+  color: white; /* Цвет текста кнопки */
+  border: none; /* Удаление границы */
+  padding: 10px 20px; /* Поля кнопки */
+  border-radius: 5px; /* Закругление углов */
+  cursor: pointer; /* Стиль курсора */
+}
+
+.main-border-button-aa:hover {
+  background-color: #0056b3; /* Фон кнопки при наведении */
+}
+
+
+
 /* 
 ---------------------------------------------
 Profile Style

@@ -1,0 +1,83 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    <!-- ***** Main Content Start ***** -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="page-content">
+            <!-- Форма логина -->
+            <div class="row justify-content-center">
+              <div class="col-lg-6">
+                {% if messages %}
+                  <div class="container mt-4">
+                    {% for message in messages %}
+                      <div class="alert
+                        {% if message.tags == 'error' %}
+                          alert-danger
+                        {% elif message.tags == 'success' %}
+                          alert-success
+                        {% elif message.tags == 'warning' %}
+                          alert-warning
+                        {% else %}
+                          alert-info
+                        {% endif %}
+                        alert-dismissible fade show" role="alert"
+                      >
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <div class="heading-section">
+                  <h4>Войти</h4>
+                </div>
+                <div class="login-form bg-dark-transparent p-4 rounded">
+                  <form action="." method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="Введите ваш email"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-3">
+                      <label for="password" class="form-label">Пароль</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Введите ваш пароль"
+                        required
+                      />
+                    </div>
+                    <div class="text-center">
+                      <button type="submit" class="main-border-button-aa">
+                        Войти
+                      </button>
+                    </div>
+                  </form>
+                  <div class="text-center mt-3">
+                    <span>Ещё нет аккаунта?</span>
+                    <a href="{% url 'register' %}" class="text-decoration-underline"
+                      >Зарегистрироваться</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Конец формы логина -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ***** Main Content End ***** -->
+{% endblock %}

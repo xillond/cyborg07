@@ -1,8 +1,8 @@
 {% extends 'main/layout.html' %}
 {% load static %}
-  {% block title %}Home page{% endblock %}
-
-   {% block content %}
+{% block title %}Home page{% endblock %}
+{% block homeclass %}class="active"{% endblock %}
+{% block content %}
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
@@ -14,6 +14,27 @@
                   <div class="col-lg-7">
                     <div class="header-text">
                       <h6>Welcome To Cyborg</h6>
+                        {% if messages %}
+                          <div class="container mt-4">
+                            {% for message in messages %}
+                              <div class="alert
+                                {% if message.tags == 'error' %}
+                                  alert-danger
+                                {% elif message.tags == 'success' %}
+                                  alert-success
+                                {% elif message.tags == 'warning' %}
+                                  alert-warning
+                                {% else %}
+                                  alert-info
+                                {% endif %}
+                                alert-dismissible fade show" role="alert"
+                              >
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
                       <h4><em>Browse</em> Our Popular Games Here</h4>
                       <div class="main-button">
                         <a href="browse.html">Browse Now</a>
@@ -105,4 +126,4 @@
           </div>
         </div>
       </div>
-    {% endblock %}
+{% endblock %}
