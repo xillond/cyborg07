@@ -1,105 +1,166 @@
 {% extends 'main/layout.html' %}
 {% load static %}
-{% block title %}{{product.name}}{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
 {% block content %}
 {% block detailsclass %}class="active"{% endblock %}
+
 <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
+    <div class="row">
+        <div class="col-lg-12">
             <div class="page-content">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="featured-games header-text">
+                             {% if messages %}
+                          <div class="container mt-4">
+                            {% for message in messages %}
+                              <div class="alert
+                                {% if message.tags == 'error' %}
+                                  alert-danger
+                                {% elif message.tags == 'success' %}
+                                  alert-success
+                                {% elif message.tags == 'warning' %}
+                                  alert-warning
+                                {% else %}
+                                  alert-info
+                                {% endif %}
+                                alert-dismissible fade show" role="alert"
+                              >
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                            <div class="heading-section">
+                                <h4><em>{{ product.name }}</em></h4>
+                            </div>
+                            <div class="owl-features owl-carousel">
+                                {% for image in images %}
+                                    <div class="item">
+                                        <div class="thumb">
+                                            <img src="{{ image.file.url }}" alt="">
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="item">
+                                        <div class="thumb">
+                                            <img src="{% static 'assets/images/defaultimg.png' %}">
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="product-details bg-dark p-4 rounded-3 text-white">
+                            <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Details</span></h2>
+                            <div class="mb-3">
+                                <h4 class="text-muted">Category</h4>
+                                <p>{{ product.category }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h4 class="text-muted">Price</h4>
+                                <p class="text-xl text-pink-400 font-bold">KGS {{ product.price|floatformat:"0" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h4 class="text-muted">Seller</h4>
+                                <p>
+                                    <a href="{% url 'profile_page' product.seller.id %}" class="text-pink-400">
+                                        {{ product.seller }}
+                                    </a>
+                                </p>
+                            </div>
+                            {% if product.seller == request.user %}
+                            <button class="btn btn-warning text-white px-4 py-2 rounded-3" id="edit-product-btn">
+                                <i class="fa fa-edit"></i> Редактировать
+                            </button>
+                            <button class="btn btn-danger text-white px-4 py-2 rounded-3" id="delete-product-btn">
+                                <i class="fa fa-trash"></i> Удалить
+                            </button>
+                            {% endif %}
+                        </div>
 
-              <!-- ***** Featured Games Start ***** -->
-              <div class="row">
-                <div class="col-lg-8">
-                  <div class="featured-games header-text">
-                    <div class="heading-section">
-                      <h4><em>{{product.name}}</em> </h4>
                     </div>
-                    <div class="owl-features owl-carousel">
-                      {% if images %}
-                        {% for image in images%}
-                          <div class="item">
-                            <div class="thumb">
-                              <img src="{{ image.file.url }}" alt="">
-                            </div>
-                          </div>
-                        {% endfor %}
-                      {% else %}
-                          <div class="item">
-                            <div class="thumb">
-                              <img src="{% static 'assets/images/defaultimg.png'%}">
-                            </div>
-                          </div>
-                      {% endif %}
-                      {% if images %}
-                        {% for image in images%}
-                          <div class="item">
-                            <div class="thumb">
-                              <img src="{{ image.file.url }}" alt="">
-                            </div>
-                          </div>
-                        {% endfor %}
-                      {% else %}
-                          <div class="item">
-                            <div class="thumb">
-                              <img src="{% static 'assets/images/defaultimg.png'%}">
-                            </div>
-                          </div>
-                      {% endif %}
-                    </div>
-                  </div>
                 </div>
-              <div class="col-lg-4">
-                <div class="product-details bg-dark p-4 rounded-3 text-white">
-                    <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Details</span></h2>
+                {% if product.seller == request.user %}
+                {% include 'partials/delete_modal.html' %}
+                {% include 'partials/edit_modal.html' %}
+                {% endif %}
 
-                    <div class="mb-3">
-                        <h4 class="text-muted">Category</h4>
-                        <p>{{ product.category }}</p>
-                    </div>
-
-                    <div class="mb-3">
-                        <h4 class="text-muted">Rating</h4>
-                        <p>
-                            <i class="fa fa-star text-warning"></i> {{ product.rating }}
-                            <span class="text-gray-400">({{ product.reviews_count }} Reviews)</span>
-                        </p>
-                    </div>
-
-                    <div class="mb-3">
-                        <h4 class="text-muted">Price</h4>
-                        <p class="text-xl text-pink-400 font-bold">KGS {{ product.price|floatformat:"0" }}</p>
-                    </div>
-
-                    <div class="mb-3">
-                        <h4 class="text-muted">Seller</h4>
-                        <p>
-                            <a href="{% url 'profile_page' product.seller.id %}" class="text-pink-400">
-                                {{ product.seller }}
-                            </a>
-                        </p>
-                    </div>
+                <div class="product-description bg-dark p-4 rounded-3 text-white mt-4">
+                    <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Description</span></h2>
+                    <p class="text-gray-400 mb-4">{{ product.description }}</p>
+                    {% if request.user != product.seller %}
+                    <button class="btn btn-pink text-white px-5 py-3 rounded-3">
+                        <i class="fa fa-shopping-cart"></i> Buy Now
+                    </button>
+                        <!-- Кнопка для вызова модального окна отзыва -->
+                        <button onclick="openReviewModal()" class="btn btn-primary">Оставить отзыв</button>
+                    {%endif %}
                 </div>
+
+                {% if request.user.is_authenticated%}  <!-- ***** TODO: поменять условие на если покупал ***** -->
+                {% include 'partials/rating_modal.html'%}
+                {% endif %}
+
+             <div class="reviews-container">
+                <h3 class="reviews-title">Отзывы покупателей</h3>
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-author">{{ review.user }}</span>
+                        <span class="review-rating">
+                            {% for _ in "12345"|make_list %}
+                                {% if forloop.counter <= review.count %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+
+                    <p class="review-text">{{ review.text }}</p>
+                    <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                    {% if product.seller == request.user %}
+                        <button class="reply-btn reply-button" data-review-id="{{ review.id }}">Ответить</button>
+                    {% include 'partials/reply_modal.html'%}
+                    {% endif %}
+
+                    {% if review.replies.all %}
+                    <div class="review-replies">
+                        {% for reply in review.replies.all %}
+                        <div class="reply-card">
+                            <div class="reply-header">
+                                <span class="reply-author">{{ reply.seller }} (Продавец)</span>
+                                <span class="reply-date">{{ reply.created_at|date:"d.m.Y H:i" }}</span>
+                                {% if reply.created_at|date:"d.m.Y H:i" != reply.updated_at|date:"d.m.Y H:i" %}
+                                <span class="reply-date">edited at: {{reply.updated_at|date:"d.m.Y H:i"}}</span>
+                                {% endif %}
+                            </div>
+                            <p class="reply-text">{{ reply.text }}</p>
+                            {% if reply.seller == request.user %}
+                                <button class="edit-reply-btn" data-reply-id="{{ reply.id }}" data-reply-text="{{ reply.text }}">✏️ Редактировать</button>
+                                <button class="delete-reply-btn" data-reply-id="{{ reply.id }}">🗑 Удалить</button>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                          {% if product.seller == request.user %}
+                            {% include 'partials/edit_delete_reply.html' %}
+                          {% endif %}
+
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="no-reviews">Отзывов пока нет. Будьте первым!</p>
+                {% endfor %}
             </div>
-              </div>
-              <!-- ***** Featured Games End ***** -->
 
-              <!-- ***** Product Description Start ***** -->
-              <div class="product-description bg-dark p-4 rounded-3 text-white mt-4">
-                  <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Description</span></h2>
-
-                  <p class="text-gray-400 mb-4">
-                      {{ product.description }}
-                  </p>
-
-                  <button class="btn btn-pink text-white px-5 py-3 rounded-3">
-                      <i class="fa fa-shopping-cart"></i> Buy Now
-                  </button>
-              </div>
-              <!-- ***** Product Description End ***** -->
-
-              <!-- ***** Similar Items Start ***** -->
-              <div class="live-stream">
+                <!-- ***** Similar Items Start ***** -->
+                 <div class="live-stream">
                 <div class="col-lg-12">
                   <div class="heading-section">
                     <h4><em>Similar</em> Items</h4>
@@ -150,11 +211,10 @@
                   </div>
                 </div>
               </div>
-              <!-- ***** Similar Items End ***** -->
-
+                <!-- ***** Similar Items End ***** -->
             </div>
-          </div>
         </div>
-      </div>
-{% endblock %}
+    </div>
+</div>
 
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'main/layout.html' %}
+{% block title %}Create Product{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2>Create Product</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Форма для основного продукта -->
+            {{ form.as_p }}
+
+            <!-- Форма для изображений -->
+            <label for="images">Upload Images:</label>
+            <input type="file" name="images" id="images" multiple required>
+
+            <!-- Выбор главного изображения -->
+            <label for="main_image">Select Main Image:</label>
+            <select name="main_image" id="main_image">
+                <!-- JS заполнит этот список -->
+            </select>
+
+            <div id="image-preview"></div>
+
+            <button type="submit">Создать продукт</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById("images").addEventListener("change", function(event) {
+        let previewDiv = document.getElementById("image-preview");
+        let mainImageSelect = document.getElementById("main_image");
+
+        previewDiv.innerHTML = "";
+        mainImageSelect.innerHTML = "";
+
+        let files = Array.from(event.target.files);  // Преобразуем FileList в массив
+        let fileReaders = files.map(file => {
+            return new Promise(resolve => {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve({ src: e.target.result, name: file.name });
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Загружаем файлы и после полной загрузки рендерим их
+        Promise.all(fileReaders).then(images => {
+            images.forEach((image, index) => {
+                let img = document.createElement("img");
+                img.src = image.src;
+                img.style = "width: 100px; margin: 5px;";
+
+                let option = document.createElement("option");
+                option.value = index;
+                option.text = `Image ${index + 1}`;
+                if (index === 0) option.selected = true;
+
+                previewDiv.appendChild(img);
+                mainImageSelect.appendChild(option);
+            });
+        });
+    });
+</script>
+{% endblock %}

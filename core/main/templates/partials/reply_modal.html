@@ -1,0 +1,51 @@
+<!-- Модальное окно для ответа на отзыв -->
+<div id="replyModal" class="reply-modal">
+    <div class="reply-modal-content">
+        <span class="reply-close">&times;</span>
+        <h2>Ответить на отзыв</h2>
+        <form method="POST" action="{% url 'reply_review' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" id="reviewId" name="review_id">
+            <textarea name="text" id="replyText" placeholder="Введите ваш ответ..." required></textarea>
+            <div class="reply-modal-buttons">
+                <button type="submit" class="reply-submit-btn">Отправить</button>
+                <button type="button" class="reply-cancel-btn">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("replyModal");
+    const closeModal = document.querySelector(".reply-close");
+    const cancelButton = document.querySelector(".reply-cancel-btn");
+    const reviewIdInput = document.getElementById("reviewId");
+    const replyText = document.getElementById("replyText");
+
+    // Открытие модального окна при нажатии "Ответить"
+    document.querySelectorAll(".reply-button").forEach(button => {
+        button.addEventListener("click", function () {
+            reviewIdInput.value = this.getAttribute("data-review-id");
+            modal.style.display = "flex";
+        });
+    });
+
+    // Функция для закрытия модального окна
+    function closeReplyModal() {
+        modal.style.display = "none";
+        replyText.value = "";  // Очистка поля
+    }
+
+    // Закрытие модального окна при нажатии на "×" или "Отмена"
+    closeModal.addEventListener("click", closeReplyModal);
+    cancelButton.addEventListener("click", closeReplyModal);
+
+    // Закрытие при клике вне окна
+    window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            closeReplyModal();
+        }
+    });
+});
+</script>

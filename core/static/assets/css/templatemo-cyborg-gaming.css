@@ -1241,6 +1241,365 @@ Start Stream Style
     background: #e03570;
     transform: scale(1.05);
 }
+
+/*
+---------------------------------------------
+Modal Style
+---------------------------------------------
+*/
+
+/* Общие стили для модальных окон */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Затемненный фон */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Контент модального окна */
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Кнопка закрытия */
+.modal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+}
+
+.modal .close:hover {
+    color: #333;
+}
+
+/* Кнопки внутри модального окна */
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons .btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-secondary {
+    background: #bdc3c7;
+    color: black;
+}
+
+.btn-secondary:hover {
+    background: #95a5a6;
+}
+
+/* Стили для изображений в окне редактирования */
+.image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.image-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.image-item img {
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.delete-image {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.delete-image:hover {
+    background: #cc0000;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 🔸 Стили для модального окна ответа */
+.reply-modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed;
+    z-index: 1100; /* Выше остальных модалок */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Затемненный фон */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 🔸 Контейнер контента для ответа */
+.reply-modal-content {
+    background: #2C2C2C; /* Темный стиль в тон сайту */
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+    color: white;
+}
+
+/* 🔸 Заголовок */
+.reply-modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 🔸 Поле ввода ответа */
+.reply-modal-content textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background: #3A3A3A;
+    color: white;
+    resize: none;
+    font-size: 16px;
+}
+
+/* 🔸 Кнопки внутри модального окна */
+.reply-modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* 🔸 Кнопка отправки */
+.reply-submit-btn {
+    padding: 10px 15px;
+    background: #ff4081;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+    width: 48%;
+}
+
+.reply-submit-btn:hover {
+    background: #ff2060;
+}
+
+/* 🔸 Кнопка отмены */
+.reply-cancel-btn {
+    padding: 10px 15px;
+    background: #bdc3c7;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+    width: 48%;
+}
+
+.reply-cancel-btn:hover {
+    background: #95a5a6;
+}
+
+/* 🔸 Кнопка закрытия */
+.reply-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ff5252;
+}
+
+.reply-close:hover {
+    color: #ff0000;
+}
+
+/* Стили для кнопки "Ответить" */
+.reply-btn {
+    background: #4CAF50; /* Зеленый цвет */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.reply-btn:hover {
+    background: #388E3C; /* Темно-зеленый при наведении */
+}
+
+/* Стили для кнопки внутри отзывов */
+.reply-btn {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+/* Кнопки "Редактировать" и "Удалить" */
+.edit-reply-btn, .delete-reply-btn {
+    margin-top: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.edit-reply-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.edit-reply-btn:hover {
+    background-color: #2980b9;
+}
+
+.delete-reply-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-reply-btn:hover {
+    background-color: #c0392b;
+}
+/*
+---------------------------------------------
+All Ratings Style
+---------------------------------------------
+*/
+
+.reviews-container {
+    background-color: #1d1d1d;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    margin-top: 2rem;
+}
+.reviews-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #f1f1f1;
+}
+
+.review-card {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+}
+
+.review-header, .reply-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.review-author {
+    color: #fca311;
+}
+
+.review-rating {
+    color: #f4c430;
+    font-size: 1.2rem;
+}
+
+.review-text, .reply-text {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.review-date, .reply-date {
+    font-size: 0.8rem;
+    color: #bbb;
+}
+
+.review-replies {
+    margin-top: 10px;
+    padding-left: 20px;
+    border-left: 3px solid #fca311;
+}
+
+.reply-card {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 8px;
+}
+.reply-author {
+    color: #ffcc00;
+}
+
+.no-reviews {
+    text-align: center;
+    color: #aaa;
+}
 /* 
 ---------------------------------------------
 Similar Items Style
@@ -1643,6 +2002,40 @@ Login And Register Page Style
 }
 
 
+/*
+---------------------------------------------
+Product Creation Page Style
+---------------------------------------------
+*/
+.form-container {
+    max-width: 500px;
+    background: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    color: #fff;
+    margin: 50px auto;
+}
+
+.form-container h2 {
+    text-align: center;
+}
+
+.btn-create {
+    width: 100%;
+    background: #ff4081;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-create:hover {
+    background: #e03570;
+    transform: scale(1.05);
+}
 
 /* 
 ---------------------------------------------

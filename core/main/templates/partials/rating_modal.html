@@ -1,0 +1,170 @@
+
+
+<!-- Модальное окно отзыва -->
+<div id="reviewModal" class="review-modal">
+    <div class="review-modal-content">
+        <span class="review-close" onclick="closeReviewModal()">&times;</span>
+        <h2>Оставить отзыв</h2>
+        <form id="reviewForm" method="POST" action="{% url 'add_review' product.id %}">
+            {% csrf_token %}
+
+            <!-- Оценка звездами -->
+            <label for="rating">Оценка:</label>
+            <div class="review-star-rating" aria-required="true">
+                <span class="review-star" data-value="1">&#9733;</span>
+                <span class="review-star" data-value="2">&#9733;</span>
+                <span class="review-star" data-value="3">&#9733;</span>
+                <span class="review-star" data-value="4">&#9733;</span>
+                <span class="review-star" data-value="5">&#9733;</span>
+            </div>
+            <input type="hidden" name="rating" id="review-rating" required>
+
+            <label for="comment">Комментарий:</label>
+            <textarea name="comment" id="comment" rows="4" required></textarea>
+
+            <button type="submit" class="btn btn-success">Отправить</button>
+        </form>
+    </div>
+</div>
+
+<!-- CSS (уникальные стили) -->
+<style>
+    /* Фон модального окна */
+    .review-modal {
+        position: fixed;
+        z-index: 1050;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    /* Контент модального окна */
+    .review-modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 320px;
+        position: relative;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+    }
+
+    /* Показываем модалку */
+    .review-modal.show {
+        visibility: visible;
+        opacity: 1;
+    }
+    .review-modal.show .review-modal-content {
+        transform: scale(1);
+    }
+
+    /* Кнопка закрытия */
+    .review-close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: gray;
+    }
+    .review-close:hover {
+        color: black;
+    }
+
+    /* Стили звезд */
+    .review-star-rating {
+        font-size: 32px;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin: 10px 0;
+    }
+
+    .review-star {
+        color: #ccc;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .review-star.active {
+        color: gold;
+    }
+
+    .review-star:hover,
+    .review-star:hover ~ .review-star {
+        color: #ffcc00;
+    }
+</style>
+
+<!-- JavaScript (исправленная логика звезд) -->
+<script>
+    function openReviewModal() {
+        document.getElementById("reviewModal").classList.add("show");
+    }
+
+    function closeReviewModal() {
+        document.getElementById("reviewModal").classList.remove("show");
+    }
+
+    // Логика выбора звёзд
+    const stars = document.querySelectorAll(".review-star");
+    const ratingInput = document.getElementById("review-rating");
+
+    let selectedRating = 0; // Храним текущий рейтинг
+
+    stars.forEach(star => {
+        // Наведение на звезды (подсвечиваем временно)
+        star.addEventListener("mouseover", function() {
+            highlightStars(this.dataset.value);
+        });
+
+        // Убираем курсор — если не выбрано, сбрасываем
+        star.addEventListener("mouseleave", function() {
+            highlightStars(selectedRating);
+        });
+
+        // Клик фиксирует рейтинг
+        star.addEventListener("click", function() {
+            selectedRating = this.dataset.value;
+            ratingInput.value = selectedRating;
+            highlightStars(selectedRating);
+        });
+    });
+
+    // Функция окрашивания звезд
+    function highlightStars(value) {
+        stars.forEach(star => {
+            if (star.dataset.value <= value) {
+                star.style.color = "gold";
+            } else {
+                star.style.color = "#ccc";
+            }
+        });
+    }
+
+    function setActiveStars(value) {
+        resetStars();
+        stars.forEach(star => {
+            if (star.dataset.value <= value) {
+                star.classList.add("active");
+            }
+        });
+    }
+
+    function resetStars() {
+        stars.forEach(star => {
+            star.style.color = "#ccc";
+            star.classList.remove("active");
+        });
+    }
+</script>

@@ -1,0 +1,159 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}{{product.name}}{% endblock %}
+{% block content %}
+{% block detailsclass %}class="active"{% endblock %}
+<div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="page-content">
+
+              <!-- ***** Featured Games Start ***** -->
+              <div class="row">
+                <div class="col-lg-8">
+                  <div class="featured-games header-text">
+                    <div class="heading-section">
+                      <h4><em>{{product.name}}</em> </h4>
+                    </div>
+                    <div class="owl-features owl-carousel">
+                      {% if images %}
+                        {% for image in images%}
+                          <div class="item">
+                            <div class="thumb">
+                              <img src="{{ image.file.url }}" alt="">
+                            </div>
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                          <div class="item">
+                            <div class="thumb">
+                              <img src="{% static 'assets/images/defaultimg.png'%}">
+                            </div>
+                          </div>
+                      {% endif %}
+                      {% if images %}
+                        {% for image in images%}
+                          <div class="item">
+                            <div class="thumb">
+                              <img src="{{ image.file.url }}" alt="">
+                            </div>
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                          <div class="item">
+                            <div class="thumb">
+                              <img src="{% static 'assets/images/defaultimg.png'%}">
+                            </div>
+                          </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              <div class="col-lg-4">
+                <div class="product-details bg-dark p-4 rounded-3 text-white">
+                    <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Details</span></h2>
+
+                    <div class="mb-3">
+                        <h4 class="text-muted">Category</h4>
+                        <p>{{ product.category }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h4 class="text-muted">Rating</h4>
+                        <p>
+                            <i class="fa fa-star text-warning"></i> {{ product.rating }}
+                            <span class="text-gray-400">({{ product.reviews_count }} Reviews)</span>
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h4 class="text-muted">Price</h4>
+                        <p class="text-xl text-pink-400 font-bold">KGS {{ product.price|floatformat:"0" }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h4 class="text-muted">Seller</h4>
+                        <p>
+                            <a href="{% url 'profile_page' product.seller.id %}" class="text-pink-400">
+                                {{ product.seller }}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+              </div>
+              <!-- ***** Featured Games End ***** -->
+
+              <!-- ***** Product Description Start ***** -->
+              <div class="product-description bg-dark p-4 rounded-3 text-white mt-4">
+                  <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Description</span></h2>
+
+                  <p class="text-gray-400 mb-4">
+                      {{ product.description }}
+                  </p>
+
+                  <button class="btn btn-pink text-white px-5 py-3 rounded-3">
+                      <i class="fa fa-shopping-cart"></i> Buy Now
+                  </button>
+              </div>
+              <!-- ***** Product Description End ***** -->
+
+              <!-- ***** Similar Items Start ***** -->
+              <div class="live-stream">
+                <div class="col-lg-12">
+                  <div class="heading-section">
+                    <h4><em>Similar</em> Items</h4>
+                  </div>
+                </div>
+                <div class="row">
+                  {% for similar_product in similar_products%}
+                  <div class="col-lg-3 col-sm-6">
+                    <a href="{% url 'product_details' similar_product.id %}">
+                      <div class="item">
+                        <div class="thumb">
+                          <img src="{{ similar_product.get_main_image }}" alt="">
+                          <div class="hover-effect">
+                            <div class="content">
+                              <div class="live">
+                                <a href="#">Live</a>
+                              </div>
+                              <ul>
+                                <li><a href="#"><i class="fa fa-eye"></i> 1.2K</a></li>
+                                <li><a href="#"><i class="fa fa-gamepad"></i> CS-GO</a></li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="down-content">
+                          <div class="avatar">
+                            {% if similar_product.seller.avatar %}
+                              <a href="{% url 'profile_page' similar_product.seller.id %}"><img src="{{ similar_product.seller.avatar.url}}" alt="" style="max-width: 46px; border-radius: 50%; float: left;"></a>
+                            {% else %}
+                              <a href="{% url 'profile_page' similar_product.seller.id %}"><img src="{% static 'assets/images/default.jpg' %}" alt="" style="max-width: 46px; border-radius: 50%; float: left;"></a>
+                            {% endif %}
+                          </div>
+                          <a href="{% url 'profile_page' similar_product.seller.id %}"><span><i class="fa fa-check"></i> {{ similar_product.seller }}</span></a>
+                          <h4>{{ similar_product.name }}</h4>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  {% empty %}
+                    <h5>К сожалению нет похожих товаров</h5>
+                  {% endfor %}
+                  <div class="col-lg-12">
+                    {% if similar_products|length == 8 %}
+                    <div class="main-button">
+                      <a href="{% url 'products_in_category' product.category.id %}">Show All Similar Items</a>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <!-- ***** Similar Items End ***** -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

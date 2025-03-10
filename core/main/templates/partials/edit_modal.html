@@ -1,0 +1,72 @@
+<div id="editProductModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Редактирование продукта</h2>
+        <form id="edit-product-form" method="post" action="{% url 'update_product' product.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div class="existing-images">
+                <h4>Загруженные изображения</h4>
+                <div class="image-list">
+                    {% for image in images %}
+                    <div class="image-item">
+                        <img src="{{ image.file.url }}" width="100">
+                        <label>
+                            <input type="radio" name="main_image" value="{{ image.id }}" {% if image.is_main %}checked{% endif %}> Главная
+                        </label>
+                        <button type="button" class="delete-image" data-image-id="{{ image.id }}">Удалить</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="new-images">
+                <h4>Добавить новые изображения</h4>
+                <input type="file" name="images" multiple>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let modal = document.getElementById("editProductModal");
+    let openBtn = document.getElementById("edit-product-btn");
+    let closeBtn = document.querySelector("#editProductModal .close");
+
+    openBtn.addEventListener("click", function() {
+        modal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    document.querySelectorAll(".delete-image").forEach(button => {
+        button.addEventListener("click", function() {
+            let imageId = this.dataset.imageId;
+            fetch("{% url 'delete_image' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "image_id": imageId })
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    this.parentElement.remove();
+                }
+            });
+        });
+    });
+});
+</script>

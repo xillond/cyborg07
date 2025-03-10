@@ -1,0 +1,74 @@
+<div id="editReplyModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Редактировать ответ</h2>
+        <form method="POST" action="{% url 'edit_reply' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" id="editReplyId" name="reply_id">
+            <textarea name="text" id="editReplyText" placeholder="Введите ваш новый ответ..." required></textarea>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<div id="deleteReplyModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Удалить ответ</h2>
+        <p>Вы уверены, что хотите удалить этот ответ? Это действие нельзя отменить.</p>
+        <form method="POST" action="{% url 'delete_reply' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" id="deleteReplyId" name="reply_id">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <button type="button" class="btn btn-secondary close-delete-modal">Отмена</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const editModal = document.getElementById("editReplyModal");
+    const deleteModal = document.getElementById("deleteReplyModal");
+
+    const editReplyId = document.getElementById("editReplyId");
+    const editReplyText = document.getElementById("editReplyText");
+    const deleteReplyId = document.getElementById("deleteReplyId");
+
+    // Открытие окна редактирования
+    document.querySelectorAll(".edit-reply-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            editReplyId.value = this.getAttribute("data-reply-id");
+            editReplyText.value = this.getAttribute("data-reply-text");
+            editModal.style.display = "flex";
+        });
+    });
+
+    // Открытие окна удаления
+    document.querySelectorAll(".delete-reply-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            deleteReplyId.value = this.getAttribute("data-reply-id");
+            deleteModal.style.display = "flex";
+        });
+    });
+
+    // Закрытие модалок
+    document.querySelectorAll(".close").forEach(close => {
+        close.addEventListener("click", function () {
+            editModal.style.display = "none";
+            deleteModal.style.display = "none";
+        });
+    });
+
+    document.querySelectorAll(".close-delete-modal").forEach(button => {
+        button.addEventListener("click", function () {
+            deleteModal.style.display = "none";
+        });
+    });
+
+    window.addEventListener("click", function (event) {
+        if (event.target === editModal) editModal.style.display = "none";
+        if (event.target === deleteModal) deleteModal.style.display = "none";
+    });
+});
+</script>

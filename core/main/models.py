@@ -109,7 +109,7 @@ class Rating(models.Model):
         auto_now_add=True
     )
     def __str__(self):
-        return str(self.text)
+        return f'({self.id}){self.user} --> {self.product} --> {self.text}'
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -145,7 +145,7 @@ class Reply(models.Model):
     )
 
     def __str__(self):
-        return f"Ответ на отзыв {self.rating.id} от {self.seller.email}"
+        return f"({self.id})Ответ на отзыв {self.rating.id} от {self.seller.email}"
 
     class Meta:
         verbose_name = 'Ответ'
