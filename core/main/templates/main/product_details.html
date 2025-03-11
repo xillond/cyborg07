@@ -92,9 +92,9 @@
                     <h2 class="text-light mb-4"><strong>Product</strong> <span class="text-pink-400">Description</span></h2>
                     <p class="text-gray-400 mb-4">{{ product.description }}</p>
                     {% if request.user != product.seller %}
-                    <button class="btn btn-pink text-white px-5 py-3 rounded-3">
+                    <a href="{% url 'add_to_cart' product.id %}"><button class="btn btn-pink text-white px-5 py-3 rounded-3">
                         <i class="fa fa-shopping-cart"></i> Buy Now
-                    </button>
+                    </button></a>
                         <!-- Кнопка для вызова модального окна отзыва -->
                         <button onclick="openReviewModal()" class="btn btn-primary">Оставить отзыв</button>
                     {%endif %}

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Image, Rating, Reply
+from .models import Product, Category, Image, Rating, Reply, Order, OrderItem, Payment
 from .forms import ProductCreateForm
 from django.contrib import messages
 from django.http import Http404
@@ -18,6 +18,9 @@ def home_page(request):
 
 def product_details(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    if product.is_active == False and request.user != product.seller:
+        messages.error(request, 'Продукт не актуален')
+        return redirect('home_page')
     images = product.images.all()
     similar_products = Product.objects.filter(category=product.category.id).exclude(id=product.id)[:8]
     form = ProductCreateForm(instance=product)
@@ -33,7 +36,7 @@ def product_details(request, product_id):
                   )
 
 def all_products_in_category(request, category_id):
-    products = Product.objects.filter(category=category_id)
+    products = Product.objects.filter(category=category_id, is_active='True')
     category = get_object_or_404(Category, id=category_id)
     return render(request, 'main/all_in_category.html',{'products': products, 'category': category})
 
@@ -64,7 +67,7 @@ def create_product(request):
                 Image.objects.create(product=product_obj,file=image, is_main=is_main)
 
             messages.success(request, 'Успешно создано!')
-            return redirect('home_page')
+            return redirect('profile_page', request.user.id)
 
     form = ProductCreateForm()
     return render(request, 'main/create_product.html', {'form': form})
@@ -203,3 +206,150 @@ def delete_reply(request, product_id):
 
     raise Http404
 
+
+def cart_page(request):
+    user = request.user
+    orders_in_cart = user.orders.filter(status='in_cart')
+    total_price = sum(order.total_price for order in orders_in_cart)
+    return render(request=request,
+                  template_name='main/cart.html',
+                  context={'orders_in_cart':orders_in_cart, 'total_price': total_price}
+
+                  )
+
+
+def add_to_cart(request, product_id):
+    user = request.user
+    product = get_object_or_404(Product, id=product_id)
+    if user == product.seller:
+        messages.error(request, 'Вы не можете купить свой же товар! ')
+        return redirect('home_page')
+    order, created = Order.objects.get_or_create(buyer=user, seller=product.seller, status='in_cart')
+    order_item = order.items.filter(product=product).first()
+    if order_item:
+        order_item.quantity += 1
+        order_item.save()
+    else:
+        OrderItem.objects.create(order=order, product=product, quantity=1, price_at_purchase=product.price)
+
+    messages.success(request, 'Успешно добавлено в корзину!')
+    return redirect('product_details', product_id=product.id)
+
+
+def update_cart_ajax(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            item_id = data.get("item_id")
+            new_quantity = data.get("quantity")
+
+            item = get_object_or_404(OrderItem, id=item_id, order__buyer=request.user)
+
+            if new_quantity < 1:
+                item.delete()
+            else:
+                item.quantity = new_quantity
+                item.save()
+
+            order = item.order
+            order_deleted = False
+
+            if not order.items.exists():
+                order.delete()
+                order_deleted = True
+                order_total = 0
+            else:
+                order_total = sum(i.product.price * i.quantity for i in order.items.all())
+
+            grand_total = sum(o.total_price for o in Order.objects.filter(buyer=request.user, status="in_cart"))
+
+            return JsonResponse({
+                "success": True,
+                "order_deleted": order_deleted,
+                "item_total": new_quantity * item.product.price if new_quantity > 0 else 0,
+                "order_total": order_total,
+                "grand_total": grand_total
+            })
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False}, status=400)
+
+
+def delete_cart_item_ajax(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            item_id = data.get("item_id")
+
+            item = get_object_or_404(OrderItem, id=item_id, order__buyer=request.user)
+            order = item.order
+            item.delete()
+
+            order_deleted = False
+            if not order.items.exists():
+                order.delete()
+                order_deleted = True
+                order_total = 0
+            else:
+                order_total = sum(i.product.price * i.quantity for i in order.items.all())
+
+            grand_total = sum(o.total_price for o in Order.objects.filter(buyer=request.user, status="in_cart"))
+
+            return JsonResponse({
+                "success": True,
+                "order_deleted": order_deleted,
+                "grand_total": grand_total
+            })
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False}, status=400)
+
+def payment_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    user = request.user
+    orders = user.orders.filter(status='in_cart')
+    if not orders:
+        messages.error(request, 'У вас нет заказов для оплаты! ')
+        return redirect('home_page')
+    price = sum(order.total_price for order in orders)
+    return render(request=request,
+                  template_name='main/payment.html',
+                  context={'orders':orders, 'price':price}
+
+                  )
+
+def process_orders(request):
+    if request.method == "POST":
+        user = request.user
+        orders = user.orders.filter(status='in_cart')
+        amount = sum(order.total_price for order in orders)
+        if not 'receipt' in request.FILES:
+            messages.error(request, 'Загрузите чек!')
+            return redirect('payment')
+        if not orders.exists():
+            messages.error(request, 'У вас нет заказов для обработки')
+            return redirect('home_page')
+        receipt = request.FILES['receipt']
+        payment= Payment.objects.create(
+            user=user,
+            amount=amount,
+            status='pending',
+            receipt=receipt
+        )
+        orders.update(payment=payment, status='pending')
+        messages.success(request, 'Ваша оплата отправлена на рассмотрение, ожидайте!')
+        return redirect('home_page')
+
+    raise Http404
+
+def orders_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    user = request.user
+    payments = Payment.objects.filter(user=user).order_by('-created_at')
+    return render(request, 'main/orders.html', {'payments':payments})

@@ -151,12 +151,57 @@ class Reply(models.Model):
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
 
+class Payment(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=[('pending', 'На рассмотрении'), ('paid', 'Оплачено'), ('failed', 'Оплата не прошла')]
+    )
+    receipt = models.FileField(
+        upload_to='receipts/',
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def save(self, *args, **kwargs):
+        # Проверяем, изменился ли статус на "оплачено"
+        if self.pk:  # Если это НЕ новый объект
+            old_payment = Payment.objects.get(pk=self.pk)
+            if old_payment.status != "paid" and self.status == "paid":
+                # Обновляем все заказы, связанные с этой оплатой
+                self.orders.filter(status="pending").update(status="paid")
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Оплата от {self.user} на сумму {self.amount} ({self.status})"
+
+    class Meta:
+        verbose_name = 'Оплата'
+        verbose_name_plural = 'Оплаты'
+
 class Order(models.Model):
     buyer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="orders",
         verbose_name="Покупатель"
+    )
+    seller = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='sells',
+        verbose_name='Продавец'
     )
     created_at = models.DateTimeField(
         auto_now_add=True
@@ -166,6 +211,7 @@ class Order(models.Model):
         verbose_name='Дата изменения'
     )
     status_choices = [
+        ('in_cart', 'В корзине'),
         ('pending', 'Ожидает оплаты'),
         ('paid', 'Оплачено'),
         ('shipped', 'Отправлено'),
@@ -175,8 +221,15 @@ class Order(models.Model):
     status = models.CharField(
         max_length=20,
         choices=status_choices,
-        default='pending',
+        default='in_cart',
         verbose_name='Статус заказа'
+    )
+    payment = models.ForeignKey(
+        Payment,
+        related_name='orders',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )
 
     @property
@@ -184,7 +237,7 @@ class Order(models.Model):
         return sum(item.quantity * item.price_at_purchase for item in self.items.all())
 
     def __str__(self):
-        return f"Заказ {self.id} - {self.buyer.email} ({self.get_status_display()})"
+        return f'Продавец: {self.seller}, Покупатель: {self.buyer}, Заказ номер {self.id}'
 
     class Meta:
         verbose_name = 'Заказ'
@@ -212,8 +265,10 @@ class OrderItem(models.Model):
 
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name} (Заказ {self.order.id})"
+        return f"{self.quantity} x {self.product.name} "
 
     class Meta:
         verbose_name = 'Товар в заказе'
         verbose_name_plural = 'Товары в заказах'
+
+

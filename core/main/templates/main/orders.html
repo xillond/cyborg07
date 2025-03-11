@@ -1,0 +1,37 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}My Orders{% endblock %}
+{% block ordersclass %}class="active"{% endblock %}
+{% block content %}
+<div class="order-container">
+    <h1>Мои заказы</h1>
+
+    {% for payment in payments %}
+    <div class="order-payment">
+        <h2>Оплата #{{ payment.id }}</h2>
+        <p>Сумма: <strong>{{ payment.amount }} KGS</strong></p>
+        <p>Статус: <span class="order-status {{ payment.status|lower }}">{{ payment.status }}</span></p>
+
+        <div class="order-list">
+            {% for order in payment.orders.all %}
+            <div class="order-card">
+                <h6>Заказ #{{ order.id }}</h6>
+                <p>Продавец: <a href="{% url 'profile_page' order.seller.id %}">{{ order.seller }}</a></p>
+                <p>Статус: <span class="order-status {{ order.status|lower }}">{{ order.status }}</span></p>
+                <p>Дата заказа: {{ order.created_at }}</p>
+
+                <div class="order-items">
+                    {% for item in order.items.all %}
+                    <div class="order-item">
+                        <img src="{{ item.product.get_main_image }}" alt="{{ item.name }}" class="order-item-img">
+                        <p class="order-item-name">{{ item }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

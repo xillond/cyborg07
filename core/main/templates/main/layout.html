@@ -72,18 +72,18 @@ https://templatemo.com/tm-579-cyborg-gaming
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
                         <li><a href="{% url 'home_page' %}" {% block homeclass %}{% endblock %}>Home</a></li>
-                        <li><a href="browse.html" {% block browseclass %}{% endblock %} >Browse</a></li>
                         <li><a href="details.html" {% block detailsclass %}{% endblock %} >Details</a></li>
-                        <li><a href="streams.html" {% block streamsclass %}{% endblock %} >Streams</a></li>
+                        <li><a href="{% url 'orders' %}" {% block ordersclass %}{% endblock %} >Orders</a></li>
+                        <li><a href="{% url 'cart' %}" {% block cartclass %}{% endblock %} >Cart</a></li>
                         {% if not request.user.is_authenticated %}
                         <li><a href="{% url 'register' %}">Register</a></li>
                         <li><a href="{% url 'login' %}">Login</a></li>
                         {% endif%}
                         {% if request.user.is_authenticated %}
                         <li><a href="{% url 'logout' %}">Logout</a></li>
-                        <li><a href="profile.html">{{request.user}} <img src="{% static 'assets/images/profile-header.jpg' %}" alt=""></a></li>
+                        <li><a href="{% url 'profile_page' request.user.id %}">{{request.user}} <img src="{% static 'assets/images/profile-header.jpg' %}" alt=""></a></li>
                         {% else %}
-                        <li><a href="profile.html">Profile <img src="{% static 'assets/images/profile-header.jpg' %}" alt=""></a></li>
+                        <li><a href="{% url 'login' %}">Profile <img src="{% static 'assets/images/profile-header.jpg' %}" alt=""></a></li>
                         {% endif %}
 
                     </ul>

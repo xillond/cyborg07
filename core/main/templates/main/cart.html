@@ -1,0 +1,110 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}Cart{% endblock %}
+{% block cartclass %}class="active"{% endblock %}
+{% block content %}
+    <div class="cart-container">
+        {% if orders_in_cart %}
+            {% for order in orders_in_cart %}
+                {% for item in order.items.all %}
+                    <div class="cart-item">
+                        <div class="item-info">
+                            <p class="item-name">{{ item.product.name }}</p>
+                            <p class="item-price">{{ item.product.price }} KGS</p>
+                        </div>
+
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, -1)">−</button>
+                            <input type="text" class="quantity-input" id="quantity-{{ item.id }}" value="{{ item.quantity }}" readonly>
+                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, 1)">+</button>
+                        </div>
+
+                        <button class="delete-btn" onclick="deleteItem({{ item.id }})">Удалить</button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="total-container">
+                <p>Общая сумма: <span id="grand-total">{{ total_price }}</span> KGS</p>
+            </div>
+
+            <button class="pay-button" onclick="window.location.href='{% url 'payment' %}'">Оплатить</button>
+        {% else %}
+            <p style="color: black;">Ваша корзина пуста</p>
+        {% endif %}
+    </div>
+
+
+<script>
+function updateQuantity(itemId, change) {
+    let quantityInput = document.getElementById(`quantity-${itemId}`);
+
+    if (!quantityInput) {
+        console.error(`Не найден input с id quantity-${itemId}`);
+        return;
+    }
+
+    let newQuantity = parseInt(quantityInput.value) + change;
+
+    if (isNaN(newQuantity)) {
+        console.error(`Ошибка: quantity не число (${quantityInput.value})`);
+        return;
+    }
+
+    if (newQuantity < 1) {
+        deleteItem(itemId);
+        return;
+    }
+
+    fetch("{% url 'update_cart_ajax' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ item_id: itemId, quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            quantityInput.value = newQuantity;
+            document.getElementById("grand-total").innerText = data.grand_total;
+        }
+    })
+    .catch(error => console.error("Ошибка при обновлении количества:", error));
+}
+
+function deleteItem(itemId) {
+    fetch("{% url 'delete_cart_item_ajax' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ item_id: itemId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+{% endblock %}

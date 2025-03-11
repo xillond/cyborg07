@@ -1,0 +1,49 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+
+<div class="payment-container">
+    <h1>Методы оплаты</h1>
+
+    <div class="payment-methods">
+        <div class="payment-card">
+            <h3>Optime</h3>
+            <p>Номер карты: <span>4169 5853 5555 7777</span></p>
+            <p>Владелец: Айбек М.А</p>
+        </div>
+        <div class="payment-card">
+            <h3>Bakai</h3>
+            <p>Номер карты: <span>1223 1223 1232 1322</span></p>
+            <p>Владелец: Айбек М.А</p>
+        </div>
+        <div class="payment-card">
+            <h3>Mbank</h3>
+            <p>По номеру телефона: <span>996707112233</span></p>
+            <p>Владелец: Айбек М.А</p>
+        </div>
+    </div>
+
+    <h2>Вы заказываете:</h2>
+    <div class="order-list">
+        {% for order in orders %}
+            {% for item in order.items.all %}
+                <p class="order-item">{{ item }}</p>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <h1 class="total-price">Итого к оплате: <span>{{ price }}</span> KGS</h1>
+
+    <p class="payment-instructions">После оплаты, пожалуйста, загрузите чек ниже.</p>
+    <p class="contact-info">Если возникли вопросы, напишите нам в WhatsApp: <span>0555 232323</span></p>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'process_orders' %}" class="payment-form">
+        {% csrf_token %}
+        <label for="receipt" class="upload-label">Загрузите чек:</label>
+        <input type="file" name="receipt" id="receipt" class="upload-input">
+        <button type="submit" class="submit-button">Отправить</button>
+    </form>
+</div>
+
+{% endblock %}

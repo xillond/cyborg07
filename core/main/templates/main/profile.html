@@ -13,7 +13,11 @@
               <div class="main-profile ">
                 <div class="row">
                   <div class="col-lg-4">
-                    <img src="{% static 'assets/images/profile.jpg' %}" alt="" style="border-radius: 23px;">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="" style="border-radius: 23px;">
+                    {% else %}
+                    <img src="{% static 'assets/images/default.jpg' %}" alt="" style="border-radius: 23px;">
+                    {% endif %}
                   </div>
                   <div class="col-lg-4 align-self-center">
                     <div class="main-info header-text">
@@ -40,24 +44,36 @@
                       <div class="row">
                         <div class="col-lg-12">
                           <div class="heading-section">
+                            {% if request.user == user%}
+                            <h4><em>Ваши</em> Товары</h4>
+                            <a href="{% url 'create_product' %}" class="btn btn-primary">Добавить товар</a>
+                            {% else %}
                             <h4><em>Товары продовца</em> {{user.first_name}}</h4>
+                            {% endif %}
                           </div>
                         </div>
+                        {% if user_products %}
                         {% for product in user_products %}
                           <div class="col-lg-3 col-sm-6">
-                            {% if product.is_active %}<a href="{% url 'product_details' product.id %}">{% endif %}
+                            {% if product.is_active or request.user == user %}<a href="{% url 'product_details' product.id %}">{% endif %}
                               <div class="item {% if not product.is_active %}inactive{% endif %}">
                                 <div class="thumb">
                                   <img src="{{ product.get_main_image }}" alt="" style="border-radius: 23px;">
                                 </div>
                                 <div class="down-content">
                                   <h4>{{product.name }}</h4>
+                                  {% if not product.is_active %}
+                                      <span class="badge bg-secondary">Неактивный</span>
+                                  {% endif %}
                                   <span><i class="fa fa-eye"></i> 250</span>
                                 </div>
                               </div>
                             </a>
                           </div>
                         {% endfor %}
+                        {% else %}
+                        <p>У пользователя пока нет товаров.</p>
+                        {% endif %}
                         <div class="col-lg-12">
                           <div class="main-button">
                             <a href="#">Load More Clips</a>
